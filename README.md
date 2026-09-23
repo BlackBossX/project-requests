@@ -1,86 +1,83 @@
-# 🎓 SCSSA-UoK Project Repository Automation
+# 🎓 Project Repository Requests
+### Department of Statistics & Computer Science • University of Kelaniya
+**Software Engineering & Computer Science Student Association (SCSSA-UoK)**
 
-[![Validate Request](https://github.com/SCSSA-UoK/project-requests/actions/workflows/validate.yml/badge.svg)](https://github.com/SCSSA-UoK/project-requests/actions/workflows/validate.yml)
-[![Create Repository](https://github.com/SCSSA-UoK/project-requests/actions/workflows/create-repo.yml/badge.svg)](https://github.com/SCSSA-UoK/project-requests/actions/workflows/create-repo.yml)
-
-Automated provisioning system for student course projects in the **Software Engineering & Computer Science Student Association (SCSSA-UoK)**.
-
----
-
-## 🔄 How the Automation Works
-
-```mermaid
-flowchart LR
-    A["👨‍🎓 Student<br/>Forks & Opens PR"] --> B["🤖 Validator Action<br/>Checks syntax, users & rules"]
-    B -->|Passed| C["👩‍🏫 Org Admin<br/>Reviews & Merges PR"]
-    B -->|Failed| D["❌ Error Comment<br/>Student pushes fix"]
-    D --> B
-    C --> E["⚙️ Provisioner Action<br/>Creates clean empty repo"]
-    E --> F["🎉 Live Project Repo<br/>Lead gets Admin<br/>Teammates get Write"]
-```
+Welcome! This portal allows students in the Department of Statistics & Computer Science to request an official private GitHub repository for their course and degree projects.
 
 ---
 
-## 🚀 Request a Repository (Zero Git Knowledge Required)
+## 🚀 How to Request a Repository (3 Simple Steps)
 
-Students can request a repository in 30 seconds without creating any files, folders, or pull requests:
+You do **not** need any Git knowledge or terminal commands to request a repository.
 
 <div align="center">
   <br>
   <a href="https://github.com/SCSSA-UoK/project-requests/issues/new?template=request.yml">
-    <img src="https://img.shields.io/badge/Click_Here_to_Submit_a_Project_Request-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Submit Request">
+    <img src="https://img.shields.io/badge/👉_CLICK_HERE_TO_REQUEST_A_REPOSITORY-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Request Repository" width="420">
   </a>
   <br><br>
 </div>
 
-1. Click the green button above (or go to **Issues &rarr; New Issue &rarr; "Project Repository Request"**).
-2. Fill out the web form with your **Repository Name**, **Category**, and **Teammates**.
-3. Click **Submit new issue**.
-4. The automated bot will validate your inputs immediately.
-5. Once an organization coordinator approves by adding the `approved` label, your repository will be created instantly!
+1. **Click the green button above** (or go to the **Issues** tab &rarr; **New Issue**).
+2. **Fill out the short form:**
+   * **Repository Name:** Following the simple name format below.
+   * **Category:** Select your course (`co2060`, `3yp`, or `4yp`).
+   * **Description:** A short sentence about what you are building.
+   * **Team Members:** Type your teammates' GitHub usernames.
+3. **Click "Submit new issue".**
+
+That’s it! Our automated bot will check your request immediately. Once a coordinator approves it, your private repository will be created automatically.
 
 ---
 
-## 🔄 Alternative Method: Pull Request Flow (Advanced)
-If you prefer creating a YAML file manually via Git:
-1. Fork this repository.
-2. Add a file `requests/<repo-name>.yml` with your details.
-3. Open a Pull Request. Once approved and merged, the repository will be provisioned.
+## 🏷️ How to Name Your Repository
 
----
+All repository names follow one simple format:
 
-## 🏷️ Repository Naming Conventions
+$$\text{Batch}-\text{Category}-\text{ProjectName}$$
 
-All repository names must adhere to the official format:
-
-$$\text{eYY}-\text{CATEGORY}-\text{ProjectTitle}$$
-
-| Component | Format | Allowed Values / Examples |
+| Part | What it means | Examples |
 | :--- | :--- | :--- |
-| **Batch** | `e[0-9]{2}` | `e20`, `e21`, `e22`, `e23` |
-| **Category** | Keyword | `co2060` *(Course Project)*, `3yp` *(3rd Year Project)*, `4yp` *(Final Year Project)* |
-| **Title** | Alphanumeric | Words separated by hyphens (e.g., `Smart-Campus`, `Food-Delivery-Api`) |
+| **Batch** | Your student batch (`e` + year) | `e20`, `e21`, `e22`, `e23` |
+| **Category** | Course code | `co2060` *(Coursework)*, `3yp` *(3rd Year Project)*, `4yp` *(Final Year Project)* |
+| **Project Name** | Short title with hyphens | `Attendance-System`, `Smart-Campus`, `Health-App` |
 
-**Valid Examples:**
-- `e22-co2060-Virtual-Lab`
-- `e21-3yp-Autonomous-Drone`
-- `e20-4yp-Medical-Imaging`
+### ✅ Good Examples:
+* `e23-co2060-Attendance-System`
+* `e22-3yp-Smart-Campus`
+* `e21-4yp-Traffic-Analyzer`
 
----
-
-## 👥 Roles & Access Permissions
-
-When your new repository is created:
-
-- **Pull Request Author (Team Lead):** Assigned **Admin** rights (can manage settings and branches).
-- **Listed Members:** Assigned **Push** rights (can clone, create branches, and push code).
-- **Visibility:** Configured per your request (`private` by default for course integrity).
+*(Please use hyphens `-`, not spaces or underscores `_`)*
 
 ---
 
-## 🛠️ Local Pre-flight Check (Optional)
+## 👥 What Happens After Approval?
 
-You can validate your file locally before pushing:
-```bash
-python3 scripts/validate_request.py --file requests/e22-co2060-My-App.yml
-```
+* **Project Lead:** The student who submitted the request becomes the **Admin** of the new repository.
+* **Teammates:** Teammates listed in the form will receive an **invitation email** from GitHub granting them write access.
+* **Privacy:** Repositories are created **Private** by default so your code stays safe and secure.
+
+---
+
+## ❓ Frequently Asked Questions
+
+**1. Where do my teammates accept the invite?**  
+They will receive an email from GitHub, or they can visit [github.com/notifications](https://github.com/notifications) to accept.
+
+**2. Can I add more members or lecturers later?**  
+Yes! As the repository Admin, you can go to **Settings &rarr; Collaborators** inside your new project repository at any time.
+
+**3. What if I make a mistake in my request?**  
+The bot will leave a friendly comment telling you what to fix. Just click the **Edit** button on your issue, fix it, and the bot will re-check it automatically.
+
+---
+
+## 📞 Department Contact
+
+**Department of Statistics & Computer Science**  
+Faculty of Science, University of Kelaniya  
+Dalugama, Kelaniya, Sri Lanka  
+
+* **Email:** [dscs@kln.ac.lk](mailto:dscs@kln.ac.lk)  
+* **Phone:** +94 (0)11 2908780 / +94 (0)11 2903371  
+* **Office Hours:** Monday – Friday (8:00 AM – 4:00 PM)  
