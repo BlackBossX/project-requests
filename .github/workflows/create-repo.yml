@@ -33,12 +33,11 @@ jobs:
       - name: Install dependencies
         run: pip install pyyaml
 
-      - name: Generate repo from template and add members
+      - name: Create repository and add members
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           REPO_FULL_NAME: ${{ github.repository }}
           ORG_NAME: ${{ github.repository_owner }}
           COMMIT_SHA: ${{ github.sha }}
-          TEMPLATE_REPO: 'project-template'
         run: |
           python3 scripts/create_repo.py

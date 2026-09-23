@@ -145,24 +145,18 @@ def main():
         if status == 200:
             print(f"ℹ️ Repository '{org_name}/{repo_name}' already exists. Skipping creation.")
         elif status == 404:
-            print(f"🔨 Generating '{org_name}/{repo_name}' from template '{org_name}/{template_repo}'...")
-            gen_endpoint = f"/repos/{org_name}/{template_repo}/generate"
+            print(f"🔨 Creating new clean repository '{org_name}/{repo_name}'...")
+            create_endpoint = f"/orgs/{org_name}/repos"
             payload = {
-                "owner": org_name,
                 "name": repo_name,
                 "description": description,
                 "private": (visibility == "private"),
-                "include_all_branches": False,
+                "auto_init": True,
             }
-            status, resp = api_request("POST", gen_endpoint, token, payload)
+            status, resp = api_request("POST", create_endpoint, token, payload)
             if status not in (200, 201):
-                print(f"⚠️ Template creation failed (HTTP {status}). Falling back to blank repository...", file=sys.stderr)
-                api_request("POST", f"/orgs/{org_name}/repos", token, {
-                    "name": repo_name,
-                    "description": description,
-                    "private": (visibility == "private"),
-                    "auto_init": True,
-                })
+                print(f"❌ Failed to create repository: HTTP {status} - {resp}", file=sys.stderr)
+                continue
 
             wait_until_repo_ready(org_name, repo_name, token)
 
@@ -185,18 +179,20 @@ def main():
             members_bullets = "\n".join(f"- @{m}" for m in members)
             comment_body = (
                 f"### 🎉 Repository Provisioned Successfully!\n\n"
-                f"Your repository is live and pre-configured with the course template.\n\n"
+                f"Your new clean repository is ready for your project.\n\n"
                 f"| Attribute | Value |\n"
                 f"| :--- | :--- |\n"
                 f"| **Repository** | [{org_name}/{repo_name}]({new_repo_url}) |\n"
                 f"| **Project Lead** | @{lead_user} *(Admin)* |\n"
-                f"| **Visibility** | `{visibility.capitalize()}` 🔒 |\n"
-                f"| **Starter Template** | [{org_name}/{template_repo}](https://github.com/{org_name}/{template_repo}) |\n\n"
+                f"| **Visibility** | `{visibility.capitalize()}` 🔒 |\n\n"
                 f"**Team Members:**\n{members_bullets}\n\n"
                 f"> 🚀 **Next Steps:**\n"
                 f"> 1. Team members should check their notifications or email to accept collaborator invites.\n"
-                f"> 2. Clone the repo: `git clone {new_repo_url}.git`\n"
-                f"> 3. Read the `README.md` and start building!\n"
+                f"> 2. Clone the repository:\n"
+                f">    ```bash\n"
+                f">    git clone {new_repo_url}.git\n"
+                f">    ```\n"
+                f"> 3. Add your project code, commit, and push!\n"
             )
             api_request("POST", f"/repos/{repo_full_name}/issues/{pr_number}/comments", token, {"body": comment_body})
 

@@ -15,7 +15,7 @@ flowchart LR
     B -->|Passed| C["👩‍🏫 Org Admin<br/>Reviews & Merges PR"]
     B -->|Failed| D["❌ Error Comment<br/>Student pushes fix"]
     D --> B
-    C --> E["⚙️ Provisioner Action<br/>Spawns repo from template"]
+    C --> E["⚙️ Provisioner Action<br/>Creates clean empty repo"]
     E --> F["🎉 Live Project Repo<br/>Lead gets Admin<br/>Teammates get Write"]
 ```
 
@@ -75,7 +75,7 @@ $$\text{eYY}-\text{CATEGORY}-\text{ProjectTitle}$$
 
 ## 👥 Roles & Access Permissions
 
-When your repository is generated from [`SCSSA-UoK/project-template`](https://github.com/SCSSA-UoK/project-template):
+When your new repository is created:
 
 - **Pull Request Author (Team Lead):** Assigned **Admin** rights (can manage settings and branches).
 - **Listed Members:** Assigned **Push** rights (can clone, create branches, and push code).
