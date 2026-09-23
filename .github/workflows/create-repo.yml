@@ -1,0 +1,44 @@
+name: Create Project Repository
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'requests/**'
+
+jobs:
+  create-repo:
+    name: Generate Repository and Grant Permissions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Generate GitHub App Installation Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Generate repo from template and add members
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          REPO_FULL_NAME: ${{ github.repository }}
+          ORG_NAME: ${{ github.repository_owner }}
+          COMMIT_SHA: ${{ github.sha }}
+          TEMPLATE_REPO: 'project-template'
+        run: |
+          python3 scripts/create_repo.py

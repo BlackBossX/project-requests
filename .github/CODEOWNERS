@@ -1,0 +1,4 @@
+# Require org admins or coordinators to review all repository requests
+# You can specify individual usernames (@kavix) or an org team (@SCSSA-UoK/admins)
+
+requests/** @kavix
