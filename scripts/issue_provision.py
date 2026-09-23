@@ -73,14 +73,15 @@ def wait_until_repo_ready(org: str, repo: str, token: str, max_retries: int = 5,
 
 
 def main():
-    token = os.environ.get("GITHUB_TOKEN", "")
+    app_token = os.environ.get("APP_TOKEN") or os.environ.get("GITHUB_TOKEN", "")
+    issue_token = os.environ.get("ISSUE_TOKEN") or os.environ.get("GITHUB_TOKEN", "")
     repo_full_name = os.environ.get("REPO_FULL_NAME", "")
     issue_number = os.environ.get("ISSUE_NUMBER", "")
     issue_author = os.environ.get("ISSUE_AUTHOR", "")
     issue_body = os.environ.get("ISSUE_BODY", "")
     org_name = os.environ.get("ORG_NAME") or (repo_full_name.split("/")[0] if "/" in repo_full_name else "SCSSA-UoK")
 
-    if not token or not issue_number or not issue_body:
+    if not app_token or not issue_number or not issue_body:
         print("Error: Missing required environment variables.", file=sys.stderr)
         sys.exit(1)
 
@@ -106,7 +107,7 @@ def main():
     print(f"🚀 Provisioning repository '{org_name}/{repo_name}' for issue #{issue_number}")
 
     # 1. Idempotency Check
-    status, _ = api_request("GET", f"/repos/{org_name}/{repo_name}", token)
+    status, _ = api_request("GET", f"/repos/{org_name}/{repo_name}", app_token)
     if status == 200:
         print(f"Repository '{org_name}/{repo_name}' already exists. Skipping creation.")
     elif status == 404:
@@ -117,24 +118,24 @@ def main():
             "private": (visibility == "private"),
             "auto_init": True,
         }
-        status, resp = api_request("POST", f"/orgs/{org_name}/repos", token, payload)
+        status, resp = api_request("POST", f"/orgs/{org_name}/repos", app_token, payload)
         if status not in (200, 201):
             print(f"Failed to create repo: HTTP {status} - {resp}", file=sys.stderr)
             sys.exit(1)
 
-        wait_until_repo_ready(org_name, repo_name, token)
+        wait_until_repo_ready(org_name, repo_name, app_token)
 
     # 2. Assign Project Lead as Admin
     if issue_author:
         print(f"Assigning admin role to @{issue_author}...")
-        api_request("PUT", f"/repos/{org_name}/{repo_name}/collaborators/{issue_author}", token, {"permission": "admin"})
+        api_request("PUT", f"/repos/{org_name}/{repo_name}/collaborators/{issue_author}", app_token, {"permission": "admin"})
 
     # 3. Assign Teammates with Push Permission
     for member in members:
         if member == issue_author:
             continue
         print(f"Adding collaborator @{member} with push access...")
-        api_request("PUT", f"/repos/{org_name}/{repo_name}/collaborators/{member}", token, {"permission": "push"})
+        api_request("PUT", f"/repos/{org_name}/{repo_name}/collaborators/{member}", app_token, {"permission": "push"})
 
     # 4. Post Celebration Comment on Issue
     new_repo_url = f"https://github.com/{org_name}/{repo_name}"
@@ -157,13 +158,13 @@ def main():
         f">    ```\n"
         f"> 3. Add your code, commit, and push!\n"
     )
-    api_request("POST", f"/repos/{repo_full_name}/issues/{issue_number}/comments", token, {"body": comment_body})
+    api_request("POST", f"/repos/{repo_full_name}/issues/{issue_number}/comments", issue_token, {"body": comment_body})
 
     # 5. Update Labels and Close Issue
-    api_request("POST", f"/repos/{repo_full_name}/issues/{issue_number}/labels", token, {"labels": ["provisioned"]})
-    api_request("DELETE", f"/repos/{repo_full_name}/issues/{issue_number}/labels/approved", token)
-    api_request("DELETE", f"/repos/{repo_full_name}/issues/{issue_number}/labels/pending-approval", token)
-    api_request("PATCH", f"/repos/{repo_full_name}/issues/{issue_number}", token, {"state": "closed", "state_reason": "completed"})
+    api_request("POST", f"/repos/{repo_full_name}/issues/{issue_number}/labels", issue_token, {"labels": ["provisioned"]})
+    api_request("DELETE", f"/repos/{repo_full_name}/issues/{issue_number}/labels/approved", issue_token)
+    api_request("DELETE", f"/repos/{repo_full_name}/issues/{issue_number}/labels/pending-approval", issue_token)
+    api_request("PATCH", f"/repos/{repo_full_name}/issues/{issue_number}", issue_token, {"state": "closed", "state_reason": "completed"})
 
     print("✨ Provisioning and issue lifecycle completed successfully.")
 
