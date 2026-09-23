@@ -1,6 +1,5 @@
 # 🎓 Project Repository Requests
 ### Department of Statistics & Computer Science • University of Kelaniya
-**Software Engineering & Computer Science Student Association (SCSSA-UoK)**
 
 Welcome! This portal allows students in the Department of Statistics & Computer Science to request an official private GitHub repository for their course and degree projects.
 
