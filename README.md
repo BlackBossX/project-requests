@@ -21,36 +21,31 @@ flowchart LR
 
 ---
 
-## 📝 Student Guide: Requesting a Repository
+## 🚀 Request a Repository (Zero Git Knowledge Required)
 
-### Step 1: Fork and Clone
-1. Click **Fork** at the top right of this repository.
-2. Clone your fork locally or edit directly on GitHub.
+Students can request a repository in 30 seconds without creating any files, folders, or pull requests:
 
-### Step 2: Create Your Request File
-Under the `requests/` directory, create a single file named after your project:
-```text
-requests/<repo-name>.yml
-```
-*(Example: `requests/e22-co2060-Attendance-App.yml`)*
+<div align="center">
+  <br>
+  <a href="https://github.com/SCSSA-UoK/project-requests/issues/new?template=request.yml">
+    <img src="https://img.shields.io/badge/Click_Here_to_Submit_a_Project_Request-2ea44f?style=for-the-badge&logo=github&logoColor=white" alt="Submit Request">
+  </a>
+  <br><br>
+</div>
 
-### Step 3: Fill in Project Details
-Copy and paste this template into your file:
+1. Click the green button above (or go to **Issues &rarr; New Issue &rarr; "Project Repository Request"**).
+2. Fill out the web form with your **Repository Name**, **Category**, and **Teammates**.
+3. Click **Submit new issue**.
+4. The automated bot will validate your inputs immediately.
+5. Once an organization coordinator approves by adding the `approved` label, your repository will be created instantly!
 
-```yaml
-repo: e22-co2060-Attendance-App
-description: Real-time QR attendance scanner and backend dashboard.
-members:
-  - student-github-username-1
-  - student-github-username-2
-visibility: private   # Use "private" (recommended) or "public"
-```
+---
 
-### Step 4: Open a Pull Request
-1. Commit and push your changes to a new branch in your fork.
-2. Submit a **Pull Request** targeting `main` of `SCSSA-UoK/project-requests`.
-3. The **SCSSA Validation Bot** will check your request within 30 seconds.
-4. Once an administrator approves and merges your PR, your repository will be created automatically!
+## 🔄 Alternative Method: Pull Request Flow (Advanced)
+If you prefer creating a YAML file manually via Git:
+1. Fork this repository.
+2. Add a file `requests/<repo-name>.yml` with your details.
+3. Open a Pull Request. Once approved and merged, the repository will be provisioned.
 
 ---
 

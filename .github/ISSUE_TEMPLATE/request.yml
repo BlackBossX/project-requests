@@ -1,0 +1,59 @@
+name: Project Repository Request
+description: Request a new course or project repository in SCSSA-UoK.
+title: "[Project Request]: "
+labels: ["project-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### 🎓 SCSSA-UoK Project Repository Request
+        Fill out this form to request your team's project repository.
+        An automated bot will validate your inputs immediately. Once approved by an organization administrator, your repository will be created automatically.
+
+  - type: input
+    id: repo_name
+    attributes:
+      label: Repository Name
+      description: Must match the naming rule `eYY-CATEGORY-Title` (e.g. `e23-co2060-Smart-Attendance`).
+      placeholder: e23-co2060-Smart-Attendance
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Project Category
+      options:
+        - co2060
+        - 3yp
+        - 4yp
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Project Description
+      description: One or two sentences describing your project.
+      placeholder: Real-time IoT student attendance tracker and web dashboard.
+    validations:
+      required: true
+
+  - type: input
+    id: members
+    attributes:
+      label: Team Members (GitHub Usernames)
+      description: Comma-separated GitHub usernames of your teammates. You (the issue creator) will automatically be assigned as Admin. Maximum 6 members.
+      placeholder: teammate1, teammate2
+    validations:
+      required: false
+
+  - type: dropdown
+    id: visibility
+    attributes:
+      label: Repository Visibility
+      options:
+        - private
+        - public
+    validations:
+      required: true
