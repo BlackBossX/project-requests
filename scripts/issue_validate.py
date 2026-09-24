@@ -2,7 +2,8 @@
 """
 SCSSA Issue Form Request Validator
 Validates student repository requests submitted via GitHub Issue Forms.
-Supports the FSSD module (fssd) with auto-generated group-based repo names.
+Supports the FSSD module with batch-aware, auto-generated group-based repo names.
+Repo name format: FSSD-B{YY}-G{NN}-{SHORT-TITLE}
 """
 
 import json
@@ -14,10 +15,18 @@ import urllib.request
 
 # Module code → prefix mapping
 MODULE_MAP = {
-    "COSC 32133 / BECS 32263 – Full-Stack Software Development (fssd)": "fssd",
+    "COSC 32133 / BECS 32263 – Full-Stack Software Development (FSSD)": "FSSD",
 }
 
-SHORT_TITLE_REGEX = re.compile(r"^[a-z0-9]+(-[a-z0-9]+){0,2}$")
+# Batch label → batch code mapping
+BATCH_MAP = {
+    "22/23": "B22",
+    "23/24": "B23",
+    "24/25": "B24",
+}
+
+# Short title: 1-3 words of letters/digits separated by spaces or hyphens
+SHORT_TITLE_REGEX = re.compile(r"^[A-Za-z0-9]+([- ][A-Za-z0-9]+){0,2}$")
 GITHUB_USER_REGEX = re.compile(r"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$")
 MAX_MEMBERS = 6
 
@@ -73,6 +82,11 @@ def parse_issue_form(body: str) -> dict:
     return fields
 
 
+def normalize_short_title(raw: str) -> str:
+    """Converts short title to uppercase with hyphens (e.g. 'Smart Bus' → 'SMART-BUS')."""
+    return re.sub(r"[\s-]+", "-", raw.strip()).upper()
+
+
 def update_issue_labels(repo_full_name: str, issue_number: str, token: str, add_labels: list, remove_labels: list):
     """Adds and removes labels cleanly."""
     if add_labels:
@@ -111,7 +125,8 @@ def main():
     form = parse_issue_form(issue_body)
 
     raw_module = form.get("Module", "").strip()
-    short_title = form.get("Project Short Title", "").strip().lower()
+    raw_batch = form.get("Student Batch", "").strip()
+    raw_short_title = form.get("Project Short Title", "").strip()
     description = form.get("Project Description", "").strip()
     raw_members = form.get("Team Members (GitHub Usernames)", "").strip()
 
@@ -122,30 +137,40 @@ def main():
     module_prefix = MODULE_MAP.get(raw_module)
     if not module_prefix:
         errors.append(
-            f"Unrecognised module selected: `{raw_module}`. "
-            f"Please choose a valid module from the dropdown."
+            f"Unrecognised module: `{raw_module}`. Please select a valid module from the dropdown."
         )
     else:
         checks["Module"] = f"✅ `{raw_module}`"
 
-    # 2. Short title validation
-    if not short_title or short_title.lower() == "_no response_":
-        errors.append("Project Short Title is required.")
-    elif not SHORT_TITLE_REGEX.match(short_title):
+    # 2. Batch validation
+    batch_code = BATCH_MAP.get(raw_batch)
+    if not batch_code:
         errors.append(
-            f"Invalid short title `{short_title}`. "
-            f"Use 1–3 lowercase words separated by hyphens only (e.g. `library-system`, `smart-bus`)."
+            f"Unrecognised batch: `{raw_batch}`. Please select a valid batch (`22/23`, `23/24`, or `24/25`)."
         )
     else:
-        checks["Short Title"] = f"✅ Valid (`{short_title}`)"
+        checks["Batch"] = f"✅ `{raw_batch}` → `{batch_code}`"
 
-    # 3. Description check
+    # 3. Short title validation
+    if not raw_short_title or raw_short_title.lower() == "_no response_":
+        errors.append("Project Short Title is required.")
+    elif not SHORT_TITLE_REGEX.match(raw_short_title):
+        errors.append(
+            f"Invalid short title `{raw_short_title}`. "
+            f"Use 1–3 words with letters/digits separated by spaces or hyphens "
+            f"(e.g. `Library System`, `Smart-Bus`, `Ecommerce`)."
+        )
+    else:
+        normalized = normalize_short_title(raw_short_title)
+        checks["Short Title"] = f"✅ Will be stored as `{normalized}`"
+
+    # 4. Description check
     if not description or description.lower() == "_no response_":
         errors.append("Project Description is required.")
     else:
         checks["Description"] = "✅ Provided"
 
-    # 4. Members validation
+    # 5. Members validation
     members = []
     if raw_members and raw_members.lower() != "_no response_":
         members = [m.strip().lstrip("@") for m in re.split(r"[,;\s]+", raw_members) if m.strip()]
@@ -168,9 +193,10 @@ def main():
         if not errors:
             checks["Team Accounts"] = f"✅ All verified ({', '.join(f'@{u}' for u in users_to_verify)})"
 
-    # 5. Preview the expected repo name (group number assigned at provisioning)
-    if module_prefix and short_title and SHORT_TITLE_REGEX.match(short_title):
-        expected_prefix = f"{module_prefix}-g??-{short_title}"
+    # 6. Preview expected repo name
+    if module_prefix and batch_code and raw_short_title and SHORT_TITLE_REGEX.match(raw_short_title):
+        normalized = normalize_short_title(raw_short_title)
+        expected_prefix = f"{module_prefix}-{batch_code}-G??-{normalized}"
         checks["Expected Repo Name"] = f"🔢 `{expected_prefix}` *(group number assigned on approval)*"
 
     if errors:

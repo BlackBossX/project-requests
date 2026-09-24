@@ -31,30 +31,37 @@ That's it! Our automated bot will check your request immediately. Once a coordin
 
 ## 🏷️ How Repositories Are Named
 
-You do **not** choose a repository name — it is generated automatically based on your module and a sequential group number:
+You do **not** choose a repository name — it is generated automatically based on your module, batch, and a sequential group number:
 
-$$\text{module}-\text{g}\text{NN}-\text{short-title}$$
+$$\text{MODULE}-\text{B}\text{YY}-\text{G}\text{NN}-\text{SHORT-TITLE}$$
 
 | Part | What it means | Example |
 | :--- | :--- | :--- |
-| **module** | Short code for your module | `fssd` |
-| **gNN** | Auto-assigned group number (zero-padded) | `g01`, `g12`, `g47` |
-| **short-title** | Your 1–3 word project title | `library-system`, `smart-bus` |
+| **MODULE** | Short code for your module (uppercase) | `FSSD` |
+| **BYY** | Your student batch | `B22`, `B23`, `B24` |
+| **GNN** | Auto-assigned group number per batch (zero-padded) | `G01`, `G12`, `G47` |
+| **SHORT-TITLE** | Your 1–3 word project title (auto-uppercased) | `SMART-BUS`, `LIBRARY-SYSTEM` |
 
 ### ✅ Examples:
-* `fssd-g01-library-system`
-* `fssd-g12-smart-bus`
-* `fssd-g47-ecommerce-app`
+* `FSSD-B24-G01-LIBRARY-SYSTEM`
+* `FSSD-B23-G12-SMART-BUS`
+* `FSSD-B22-G47-ECOMMERCE-APP`
 
-*(Use lowercase letters and hyphens `-` only — no spaces or underscores)*
+*(Group numbers are assigned per batch — `FSSD-B24` and `FSSD-B23` each have their own independent numbering)*
 
 ---
 
-## 📚 Supported Modules
+## 📚 Supported Modules & Batches
 
 | Module Code | Full Name |
 | :--- | :--- |
-| `fssd` | COSC 32133 / BECS 32263 – Full-Stack Software Development (24/25) |
+| `FSSD` | COSC 32133 / BECS 32263 – Full-Stack Software Development |
+
+| Batch Label | Batch Code |
+| :--- | :--- |
+| `22/23` | `B22` |
+| `23/24` | `B23` |
+| `24/25` | `B24` |
 
 ---
 
