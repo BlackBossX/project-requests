@@ -2,6 +2,7 @@
 """
 SCSSA Issue Form Request Validator
 Validates student repository requests submitted via GitHub Issue Forms.
+Supports the FSSD module (fssd) with auto-generated group-based repo names.
 """
 
 import json
@@ -11,7 +12,12 @@ import sys
 import urllib.error
 import urllib.request
 
-REPO_REGEX = re.compile(r"^e[0-9]{2}-(co2060|3yp|4yp)-[A-Za-z0-9-]+$")
+# Module code → prefix mapping
+MODULE_MAP = {
+    "COSC 32133 / BECS 32263 – Full-Stack Software Development (fssd)": "fssd",
+}
+
+SHORT_TITLE_REGEX = re.compile(r"^[a-z0-9]+(-[a-z0-9]+){0,2}$")
 GITHUB_USER_REGEX = re.compile(r"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$")
 MAX_MEMBERS = 6
 
@@ -104,42 +110,34 @@ def main():
 
     form = parse_issue_form(issue_body)
 
-    repo_name = form.get("Repository Name", "").strip()
-    category = form.get("Project Category", "").strip()
+    raw_module = form.get("Module", "").strip()
+    short_title = form.get("Project Short Title", "").strip().lower()
     description = form.get("Project Description", "").strip()
     raw_members = form.get("Team Members (GitHub Usernames)", "").strip()
-    visibility = form.get("Repository Visibility", "private").strip().lower()
-
-    if "private" in visibility:
-        visibility = "private"
-    elif "public" in visibility:
-        visibility = "public"
-
-    # Parse members list
-    members = []
-    if raw_members and raw_members.lower() != "_no response_":
-        members = [m.strip().lstrip("@") for m in re.split(r"[,;\s]+", raw_members) if m.strip()]
 
     errors = []
     checks = {}
 
-    # 1. Repo name regex check
-    if not repo_name or repo_name.lower() == "_no response_":
-        errors.append("Repository Name is required.")
-    elif not REPO_REGEX.match(repo_name):
+    # 1. Module validation
+    module_prefix = MODULE_MAP.get(raw_module)
+    if not module_prefix:
         errors.append(
-            f"Invalid repository name `{repo_name}`. It must match `^e[0-9]{{2}}-(co2060|3yp|4yp)-[A-Za-z0-9-]+$`.\n"
-            f"Examples: `e23-co2060-Attendance-System`, `e22-3yp-Smart-Campus`."
+            f"Unrecognised module selected: `{raw_module}`. "
+            f"Please choose a valid module from the dropdown."
         )
     else:
-        checks["Repository Name Format"] = f"✅ Valid (`{repo_name}`)"
+        checks["Module"] = f"✅ `{raw_module}`"
 
-    # 2. Category alignment
-    if category and repo_name and category in ("co2060", "3yp", "4yp"):
-        if f"-{category}-" not in repo_name:
-            errors.append(f"Repository name `{repo_name}` does not match selected category `{category}`.")
-        else:
-            checks["Category Alignment"] = f"✅ Matches `{category}`"
+    # 2. Short title validation
+    if not short_title or short_title.lower() == "_no response_":
+        errors.append("Project Short Title is required.")
+    elif not SHORT_TITLE_REGEX.match(short_title):
+        errors.append(
+            f"Invalid short title `{short_title}`. "
+            f"Use 1–3 lowercase words separated by hyphens only (e.g. `library-system`, `smart-bus`)."
+        )
+    else:
+        checks["Short Title"] = f"✅ Valid (`{short_title}`)"
 
     # 3. Description check
     if not description or description.lower() == "_no response_":
@@ -148,6 +146,10 @@ def main():
         checks["Description"] = "✅ Provided"
 
     # 4. Members validation
+    members = []
+    if raw_members and raw_members.lower() != "_no response_":
+        members = [m.strip().lstrip("@") for m in re.split(r"[,;\s]+", raw_members) if m.strip()]
+
     if len(members) > MAX_MEMBERS:
         errors.append(f"Too many team members listed ({len(members)}). Maximum allowed is {MAX_MEMBERS}.")
     else:
@@ -166,13 +168,10 @@ def main():
         if not errors:
             checks["Team Accounts"] = f"✅ All verified ({', '.join(f'@{u}' for u in users_to_verify)})"
 
-    # 5. Org availability check
-    if repo_name and not errors:
-        status, _ = api_request("GET", f"/repos/{org_name}/{repo_name}", token)
-        if status == 200:
-            errors.append(f"Repository `{org_name}/{repo_name}` already exists in `{org_name}`.")
-        elif status == 404:
-            checks["Org Availability"] = f"✅ Name available in `{org_name}`"
+    # 5. Preview the expected repo name (group number assigned at provisioning)
+    if module_prefix and short_title and SHORT_TITLE_REGEX.match(short_title):
+        expected_prefix = f"{module_prefix}-g??-{short_title}"
+        checks["Expected Repo Name"] = f"🔢 `{expected_prefix}` *(group number assigned on approval)*"
 
     if errors:
         comment = (
@@ -197,10 +196,8 @@ def main():
             "| Check | Status |\n"
             "| :--- | :--- |\n"
             f"{checks_table}\n"
-            f"| **Target Repository** | `{org_name}/{repo_name}` |\n"
             f"| **Project Lead** | `@{issue_author}` (Admin) |\n"
-            f"| **Team Members** | {members_str} |\n"
-            f"| **Visibility** | `{visibility}` |\n\n"
+            f"| **Team Members** | {members_str} |\n\n"
             "---\n"
             "👩‍🏫 **Administrator Action:** Add the label **`approved`** to provision this repository immediately."
         )
