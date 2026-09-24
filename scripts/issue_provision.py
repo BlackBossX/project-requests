@@ -2,6 +2,7 @@
 """
 SCSSA Issue Form Provisioner
 Provisions a new clean course repository when an administrator applies the `approved` label.
+Auto-assigns the next sequential group number for the module (e.g. fssd-g01-library-system).
 """
 
 import json
@@ -11,6 +12,11 @@ import sys
 import time
 import urllib.error
 import urllib.request
+
+# Module code → prefix mapping (must match issue_validate.py)
+MODULE_MAP = {
+    "COSC 32133 / BECS 32263 – Full-Stack Software Development (fssd)": "fssd",
+}
 
 
 def api_request(method: str, endpoint: str, token: str, data: dict = None):
@@ -63,6 +69,33 @@ def parse_issue_form(body: str) -> dict:
     return fields
 
 
+def get_next_group_number(org: str, prefix: str, token: str) -> int:
+    """
+    Scans all org repos matching `{prefix}-g*` and returns the next sequential group number.
+    Uses pagination to handle orgs with many repos.
+    """
+    group_regex = re.compile(rf"^{re.escape(prefix)}-g(\d+)-", re.IGNORECASE)
+    max_group = 0
+    page = 1
+
+    while True:
+        status, repos = api_request("GET", f"/orgs/{org}/repos?per_page=100&page={page}", token)
+        if status != 200 or not isinstance(repos, list) or len(repos) == 0:
+            break
+        for repo in repos:
+            name = repo.get("name", "")
+            match = group_regex.match(name)
+            if match:
+                num = int(match.group(1))
+                if num > max_group:
+                    max_group = num
+        if len(repos) < 100:
+            break
+        page += 1
+
+    return max_group + 1
+
+
 def wait_until_repo_ready(org: str, repo: str, token: str, max_retries: int = 5, delay: int = 2) -> bool:
     for attempt in range(1, max_retries + 1):
         status, _ = api_request("GET", f"/repos/{org}/{repo}", token)
@@ -86,23 +119,30 @@ def main():
         sys.exit(1)
 
     form = parse_issue_form(issue_body)
-    repo_name = form.get("Repository Name", "").strip()
+    raw_module = form.get("Module", "").strip()
+    short_title = form.get("Project Short Title", "").strip().lower()
     description = form.get("Project Description", "Student project repository").strip()
     raw_members = form.get("Team Members (GitHub Usernames)", "").strip()
-    visibility = form.get("Repository Visibility", "private").strip().lower()
 
-    if "private" in visibility:
-        visibility = "private"
-    elif "public" in visibility:
-        visibility = "public"
+    # Resolve module prefix
+    module_prefix = MODULE_MAP.get(raw_module)
+    if not module_prefix:
+        print(f"Error: Unrecognised module '{raw_module}'.", file=sys.stderr)
+        sys.exit(1)
 
+    if not short_title or short_title == "_no response_":
+        print("Error: No short title found in issue.", file=sys.stderr)
+        sys.exit(1)
+
+    # Parse members
     members = []
     if raw_members and raw_members.lower() != "_no response_":
         members = [m.strip().lstrip("@") for m in re.split(r"[,;\s]+", raw_members) if m.strip()]
 
-    if not repo_name:
-        print("Error: No repository name found in issue.", file=sys.stderr)
-        sys.exit(1)
+    # Auto-assign next group number
+    print(f"🔢 Calculating next group number for prefix '{module_prefix}'...")
+    group_number = get_next_group_number(org_name, module_prefix, app_token)
+    repo_name = f"{module_prefix}-g{group_number:02d}-{short_title}"
 
     print(f"🚀 Provisioning repository '{org_name}/{repo_name}' for issue #{issue_number}")
 
@@ -111,11 +151,11 @@ def main():
     if status == 200:
         print(f"Repository '{org_name}/{repo_name}' already exists. Skipping creation.")
     elif status == 404:
-        print(f"Creating new clean repository '{org_name}/{repo_name}'...")
+        print(f"Creating new repository '{org_name}/{repo_name}'...")
         payload = {
             "name": repo_name,
             "description": description,
-            "private": (visibility == "private"),
+            "private": True,
             "auto_init": True,
         }
         status, resp = api_request("POST", f"/orgs/{org_name}/repos", app_token, payload)
@@ -147,8 +187,10 @@ def main():
         f"| Attribute | Value |\n"
         f"| :--- | :--- |\n"
         f"| **Repository** | [{org_name}/{repo_name}]({new_repo_url}) |\n"
+        f"| **Group Number** | `Group {group_number:02d}` |\n"
+        f"| **Module** | `{raw_module}` |\n"
         f"| **Project Lead** | @{issue_author} *(Admin)* |\n"
-        f"| **Visibility** | `{visibility.capitalize()}` 🔒 |\n\n"
+        f"| **Visibility** | `Private` 🔒 |\n\n"
         f"**Team Members:**\n{members_bullets}\n\n"
         f"> 🚀 **Next Steps:**\n"
         f"> 1. Team members should check their notifications or email to accept collaborator invites.\n"
@@ -166,7 +208,7 @@ def main():
     api_request("DELETE", f"/repos/{repo_full_name}/issues/{issue_number}/labels/pending-approval", issue_token)
     api_request("PATCH", f"/repos/{repo_full_name}/issues/{issue_number}", issue_token, {"state": "closed", "state_reason": "completed"})
 
-    print("✨ Provisioning and issue lifecycle completed successfully.")
+    print(f"✨ Provisioning complete: '{org_name}/{repo_name}' (Group {group_number:02d})")
 
 
 if __name__ == "__main__":

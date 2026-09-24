@@ -1,7 +1,7 @@
 # 🎓 Project Repository Requests
 ### Department of Statistics & Computer Science • University of Kelaniya
 
-Welcome! This portal allows students in the Department of Statistics & Computer Science to request an official private GitHub repository for their course and degree projects.
+Welcome! This portal allows students in the Department of Statistics & Computer Science to request an official private GitHub repository for their module projects.
 
 ---
 
@@ -17,44 +17,53 @@ You do **not** need any Git knowledge or terminal commands to request a reposito
   <br><br>
 </div>
 
-1. **Click the green button above** (or go to the **Issues** tab &rarr; **New Issue**).
+1. **Click the green button above** (or go to the **Issues** tab → **New Issue**).
 2. **Fill out the short form:**
-   * **Repository Name:** Following the simple name format below.
-   * **Category:** Select your course (`co2060`, `3yp`, or `4yp`).
-   * **Description:** A short sentence about what you are building.
-   * **Team Members:** Type your teammates' GitHub usernames.
+   * **Module:** Select your module from the dropdown.
+   * **Project Short Title:** A 1–3 word lowercase title with hyphens (e.g. `library-system`, `smart-bus`).
+   * **Project Description:** A short sentence about what you are building.
+   * **Team Members:** Type your teammates' GitHub usernames (comma-separated).
 3. **Click "Submit new issue".**
 
-That’s it! Our automated bot will check your request immediately. Once a coordinator approves it, your private repository will be created automatically.
+That's it! Our automated bot will check your request immediately. Once a coordinator approves it, your private repository will be created automatically — with a **group number assigned for you**.
 
 ---
 
-## 🏷️ How to Name Your Repository
+## 🏷️ How Repositories Are Named
 
-All repository names follow one simple format:
+You do **not** choose a repository name — it is generated automatically based on your module and a sequential group number:
 
-$$\text{Batch}-\text{Category}-\text{ProjectName}$$
+$$\text{module}-\text{g}\text{NN}-\text{short-title}$$
 
-| Part | What it means | Examples |
+| Part | What it means | Example |
 | :--- | :--- | :--- |
-| **Batch** | Your student batch (`e` + year) | `e20`, `e21`, `e22`, `e23` |
-| **Category** | Course code | `co2060` *(Coursework)*, `3yp` *(3rd Year Project)*, `4yp` *(Final Year Project)* |
-| **Project Name** | Short title with hyphens | `Attendance-System`, `Smart-Campus`, `Health-App` |
+| **module** | Short code for your module | `fssd` |
+| **gNN** | Auto-assigned group number (zero-padded) | `g01`, `g12`, `g47` |
+| **short-title** | Your 1–3 word project title | `library-system`, `smart-bus` |
 
-### ✅ Good Examples:
-* `e23-co2060-Attendance-System`
-* `e22-3yp-Smart-Campus`
-* `e21-4yp-Traffic-Analyzer`
+### ✅ Examples:
+* `fssd-g01-library-system`
+* `fssd-g12-smart-bus`
+* `fssd-g47-ecommerce-app`
 
-*(Please use hyphens `-`, not spaces or underscores `_`)*
+*(Use lowercase letters and hyphens `-` only — no spaces or underscores)*
+
+---
+
+## 📚 Supported Modules
+
+| Module Code | Full Name |
+| :--- | :--- |
+| `fssd` | COSC 32133 / BECS 32263 – Full-Stack Software Development (24/25) |
 
 ---
 
 ## 👥 What Happens After Approval?
 
+* **Group Number:** Your team is automatically assigned the next available group number.
 * **Project Lead:** The student who submitted the request becomes the **Admin** of the new repository.
 * **Teammates:** Teammates listed in the form will receive an **invitation email** from GitHub granting them write access.
-* **Privacy:** Repositories are created **Private** by default so your code stays safe and secure.
+* **Privacy:** All repositories are created **Private** by default so your code stays safe and secure.
 
 ---
 
@@ -64,10 +73,13 @@ $$\text{Batch}-\text{Category}-\text{ProjectName}$$
 They will receive an email from GitHub, or they can visit [github.com/notifications](https://github.com/notifications) to accept.
 
 **2. Can I add more members or lecturers later?**  
-Yes! As the repository Admin, you can go to **Settings &rarr; Collaborators** inside your new project repository at any time.
+Yes! As the repository Admin, you can go to **Settings → Collaborators** inside your new project repository at any time.
 
 **3. What if I make a mistake in my request?**  
 The bot will leave a friendly comment telling you what to fix. Just click the **Edit** button on your issue, fix it, and the bot will re-check it automatically.
+
+**4. How is my group number decided?**  
+Group numbers are assigned automatically and sequentially when your request is approved — no action needed from you.
 
 ---
 
