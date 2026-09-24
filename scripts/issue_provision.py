@@ -2,7 +2,8 @@
 """
 SCSSA Issue Form Provisioner
 Provisions a new clean course repository when an administrator applies the `approved` label.
-Auto-assigns the next sequential group number for the module (e.g. fssd-g01-library-system).
+Auto-assigns the next sequential group number PER BATCH for the module.
+Repo name format: FSSD-B{YY}-G{NN}-{SHORT-TITLE}  (e.g. FSSD-B24-G01-SMART-BUS)
 """
 
 import json
@@ -15,7 +16,14 @@ import urllib.request
 
 # Module code → prefix mapping (must match issue_validate.py)
 MODULE_MAP = {
-    "COSC 32133 / BECS 32263 – Full-Stack Software Development (fssd)": "fssd",
+    "COSC 32133 / BECS 32263 – Full-Stack Software Development (FSSD)": "FSSD",
+}
+
+# Batch label → batch code mapping (must match issue_validate.py)
+BATCH_MAP = {
+    "22/23": "B22",
+    "23/24": "B23",
+    "24/25": "B24",
 }
 
 
@@ -69,12 +77,22 @@ def parse_issue_form(body: str) -> dict:
     return fields
 
 
-def get_next_group_number(org: str, prefix: str, token: str) -> int:
+def normalize_short_title(raw: str) -> str:
+    """Converts short title to uppercase with hyphens (e.g. 'Smart Bus' → 'SMART-BUS')."""
+    return re.sub(r"[\s-]+", "-", raw.strip()).upper()
+
+
+def get_next_group_number(org: str, module_prefix: str, batch_code: str, token: str) -> int:
     """
-    Scans all org repos matching `{prefix}-g*` and returns the next sequential group number.
+    Scans all org repos matching `{MODULE_PREFIX}-{BATCH_CODE}-G*` and returns
+    the next sequential group number for that specific batch.
     Uses pagination to handle orgs with many repos.
     """
-    group_regex = re.compile(rf"^{re.escape(prefix)}-g(\d+)-", re.IGNORECASE)
+    # e.g. matches FSSD-B24-G01-SMART-BUS → captures "01"
+    group_regex = re.compile(
+        rf"^{re.escape(module_prefix)}-{re.escape(batch_code)}-G(\d+)-",
+        re.IGNORECASE
+    )
     max_group = 0
     page = 1
 
@@ -120,7 +138,8 @@ def main():
 
     form = parse_issue_form(issue_body)
     raw_module = form.get("Module", "").strip()
-    short_title = form.get("Project Short Title", "").strip().lower()
+    raw_batch = form.get("Student Batch", "").strip()
+    raw_short_title = form.get("Project Short Title", "").strip()
     description = form.get("Project Description", "Student project repository").strip()
     raw_members = form.get("Team Members (GitHub Usernames)", "").strip()
 
@@ -130,19 +149,27 @@ def main():
         print(f"Error: Unrecognised module '{raw_module}'.", file=sys.stderr)
         sys.exit(1)
 
-    if not short_title or short_title == "_no response_":
+    # Resolve batch code
+    batch_code = BATCH_MAP.get(raw_batch)
+    if not batch_code:
+        print(f"Error: Unrecognised batch '{raw_batch}'.", file=sys.stderr)
+        sys.exit(1)
+
+    # Normalize short title
+    if not raw_short_title or raw_short_title.lower() == "_no response_":
         print("Error: No short title found in issue.", file=sys.stderr)
         sys.exit(1)
+    short_title = normalize_short_title(raw_short_title)
 
     # Parse members
     members = []
     if raw_members and raw_members.lower() != "_no response_":
         members = [m.strip().lstrip("@") for m in re.split(r"[,;\s]+", raw_members) if m.strip()]
 
-    # Auto-assign next group number
-    print(f"🔢 Calculating next group number for prefix '{module_prefix}'...")
-    group_number = get_next_group_number(org_name, module_prefix, app_token)
-    repo_name = f"{module_prefix}-g{group_number:02d}-{short_title}"
+    # Auto-assign next group number (scoped to this batch)
+    print(f"🔢 Calculating next group number for '{module_prefix}-{batch_code}'...")
+    group_number = get_next_group_number(org_name, module_prefix, batch_code, app_token)
+    repo_name = f"{module_prefix}-{batch_code}-G{group_number:02d}-{short_title}"
 
     print(f"🚀 Provisioning repository '{org_name}/{repo_name}' for issue #{issue_number}")
 
@@ -187,8 +214,9 @@ def main():
         f"| Attribute | Value |\n"
         f"| :--- | :--- |\n"
         f"| **Repository** | [{org_name}/{repo_name}]({new_repo_url}) |\n"
-        f"| **Group Number** | `Group {group_number:02d}` |\n"
         f"| **Module** | `{raw_module}` |\n"
+        f"| **Batch** | `{raw_batch}` (`{batch_code}`) |\n"
+        f"| **Group Number** | `Group {group_number:02d}` |\n"
         f"| **Project Lead** | @{issue_author} *(Admin)* |\n"
         f"| **Visibility** | `Private` 🔒 |\n\n"
         f"**Team Members:**\n{members_bullets}\n\n"
@@ -208,7 +236,7 @@ def main():
     api_request("DELETE", f"/repos/{repo_full_name}/issues/{issue_number}/labels/pending-approval", issue_token)
     api_request("PATCH", f"/repos/{repo_full_name}/issues/{issue_number}", issue_token, {"state": "closed", "state_reason": "completed"})
 
-    print(f"✨ Provisioning complete: '{org_name}/{repo_name}' (Group {group_number:02d})")
+    print(f"✨ Provisioning complete: '{org_name}/{repo_name}' (Batch {raw_batch}, Group {group_number:02d})")
 
 
 if __name__ == "__main__":
