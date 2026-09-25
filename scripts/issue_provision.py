@@ -78,8 +78,8 @@ def parse_issue_form(body: str) -> dict:
 
 
 def normalize_short_title(raw: str) -> str:
-    """Converts short title to uppercase with hyphens (e.g. 'Smart Bus' → 'SMART-BUS')."""
-    return re.sub(r"[\s-]+", "-", raw.strip()).upper()
+    """Converts short title to title case with hyphens (e.g. 'smart bus' → 'Smart-Bus')."""
+    return re.sub(r"[\s-]+", "-", raw.strip()).title()
 
 
 def get_next_group_number(org: str, module_prefix: str, batch_code: str, token: str) -> int:
@@ -135,6 +135,25 @@ def main():
     if not app_token or not issue_number or not issue_body:
         print("Error: Missing required environment variables.", file=sys.stderr)
         sys.exit(1)
+
+    actor = os.environ.get("ACTOR", "")
+    if actor:
+        is_admin = False
+        codeowners_path = ".github/CODEOWNERS"
+        if os.path.exists(codeowners_path):
+            with open(codeowners_path, "r") as f:
+                if f"@{actor}" in f.read():
+                    is_admin = True
+                    
+        if not is_admin:
+            comment_body = (
+                f"### ❌ Approval Denied\n\n"
+                f"Sorry @{actor}, only administrators listed in `.github/CODEOWNERS` can approve repository requests."
+            )
+            api_request("POST", f"/repos/{repo_full_name}/issues/{issue_number}/comments", issue_token, {"body": comment_body})
+            api_request("DELETE", f"/repos/{repo_full_name}/issues/{issue_number}/labels/approved", issue_token)
+            print(f"Error: @{actor} is not authorized to approve.", file=sys.stderr)
+            sys.exit(1)
 
     form = parse_issue_form(issue_body)
     raw_module = form.get("Module", "").strip()
