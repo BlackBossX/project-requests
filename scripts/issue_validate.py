@@ -26,7 +26,7 @@ BATCH_MAP = {
 }
 
 # Short title: 1-3 words of letters/digits separated by spaces or hyphens
-SHORT_TITLE_REGEX = re.compile(r"^[A-Za-z0-9]+([- ][A-Za-z0-9]+){0,2}$")
+SHORT_TITLE_REGEX = re.compile(r"^[A-Za-z0-9]+([- ][A-Za-z0-9]+){0,3}$")
 GITHUB_USER_REGEX = re.compile(r"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$")
 MAX_MEMBERS = 6
 
@@ -83,8 +83,8 @@ def parse_issue_form(body: str) -> dict:
 
 
 def normalize_short_title(raw: str) -> str:
-    """Converts short title to uppercase with hyphens (e.g. 'Smart Bus' → 'SMART-BUS')."""
-    return re.sub(r"[\s-]+", "-", raw.strip()).upper()
+    """Converts short title to title case with hyphens (e.g. 'smart bus' → 'Smart-Bus')."""
+    return re.sub(r"[\s-]+", "-", raw.strip()).title()
 
 
 def update_issue_labels(repo_full_name: str, issue_number: str, token: str, add_labels: list, remove_labels: list):
@@ -157,7 +157,7 @@ def main():
     elif not SHORT_TITLE_REGEX.match(raw_short_title):
         errors.append(
             f"Invalid short title `{raw_short_title}`. "
-            f"Use 1–3 words with letters/digits separated by spaces or hyphens "
+            f"Use 1–4 words with letters/digits separated by spaces or hyphens "
             f"(e.g. `Library System`, `Smart-Bus`, `Ecommerce`)."
         )
     else:
@@ -225,7 +225,7 @@ def main():
             f"| **Project Lead** | `@{issue_author}` (Admin) |\n"
             f"| **Team Members** | {members_str} |\n\n"
             "---\n"
-            "👩‍🏫 **Administrator Action:** Add the label **`approved`** to provision this repository immediately."
+            "👩‍🏫 **Administrator Action:** Add the label **`approved`** or comment **`/approved`** to provision this repository immediately."
         )
         update_issue_labels(repo_full_name, issue_number, token, add_labels=["pending-approval"], remove_labels=["needs-revision"])
         upsert_comment(repo_full_name, issue_number, token, comment)

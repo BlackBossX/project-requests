@@ -1,6 +1,6 @@
 # Repository Guidelines
 
-- **Git User Name:** `kavix`
-- **Git User Email:** `kavix@yahoo.com`
+- **Git User Name:** `BlakY`
+- **Git User Email:** `malandealwis@gmail.com`
 - **Commit Sign-Off:** All commits to this repository must be signed off:
-  `Signed-off-by: kavix <kavix@yahoo.com>`
+  `Signed-off-by: BlakY <malandealwis@gmail.com>`

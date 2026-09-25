@@ -20,7 +20,7 @@ You do **not** need any Git knowledge or terminal commands to request a reposito
 1. **Click the green button above** (or go to the **Issues** tab → **New Issue**).
 2. **Fill out the short form:**
    * **Module:** Select your module from the dropdown.
-   * **Project Short Title:** A 1–3 word lowercase title with hyphens (e.g. `library-system`, `smart-bus`).
+   * **Project Short Title:** A 1–4 word title with spaces or hyphens (e.g. `Library System`, `Smart-Bus`).
    * **Project Description:** A short sentence about what you are building.
    * **Team Members:** Type your teammates' GitHub usernames (comma-separated).
 3. **Click "Submit new issue".**
@@ -40,12 +40,12 @@ $$\text{MODULE}-\text{B}\text{YY}-\text{G}\text{NN}-\text{SHORT-TITLE}$$
 | **MODULE** | Short code for your module (uppercase) | `FSSD` |
 | **BYY** | Your student batch | `B22`, `B23`, `B24` |
 | **GNN** | Auto-assigned group number per batch (zero-padded) | `G01`, `G12`, `G47` |
-| **SHORT-TITLE** | Your 1–3 word project title (auto-uppercased) | `SMART-BUS`, `LIBRARY-SYSTEM` |
+| **SHORT-TITLE** | Your 1–4 word project title (auto Title Case) | `Smart-Bus`, `Library-System` |
 
 ### ✅ Examples:
-* `FSSD-B24-G01-LIBRARY-SYSTEM`
-* `FSSD-B23-G12-SMART-BUS`
-* `FSSD-B22-G47-ECOMMERCE-APP`
+* `FSSD-B24-G01-Library-System`
+* `FSSD-B23-G12-Smart-Bus`
+* `FSSD-B22-G47-Ecommerce-App`
 
 *(Group numbers are assigned per batch — `FSSD-B24` and `FSSD-B23` each have their own independent numbering)*
 
