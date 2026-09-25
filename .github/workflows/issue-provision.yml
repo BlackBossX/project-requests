@@ -15,7 +15,7 @@ jobs:
     name: Provision Approved Repository
     if: >
       (github.event_name == 'issues' && github.event.label.name == 'approved') ||
-      (github.event_name == 'issue_comment' && github.event.issue.state == 'open' && startsWith(github.event.comment.body, '/approved'))
+      (github.event_name == 'issue_comment' && github.event.issue.state == 'open' && github.event.comment.body == '/approved')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
