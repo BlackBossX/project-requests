@@ -25,7 +25,7 @@ BATCH_MAP = {
     "24/25": "B24",
 }
 
-# Short title: 1-3 words of letters/digits separated by spaces or hyphens
+# Short title: 1-4 words of letters/digits separated by spaces or hyphens
 SHORT_TITLE_REGEX = re.compile(r"^[A-Za-z0-9]+([- ][A-Za-z0-9]+){0,3}$")
 GITHUB_USER_REGEX = re.compile(r"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$")
 MAX_MEMBERS = 6
