@@ -1,5 +1,6 @@
-# Project Repository Requests
-### Department of Statistics & Computer Science • University of Kelaniya
+
+# <div align="center"> Project Repository Requests </div>
+###  <div align="center"> Department of Statistics & Computer Science • University of Kelaniya  </div>
 
 Welcome! This portal allows students in the Department of Statistics & Computer Science to request an official GitHub repository for their module projects.
 
