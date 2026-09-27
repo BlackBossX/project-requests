@@ -1,11 +1,11 @@
-# 🎓 Project Repository Requests
+# Project Repository Requests
 ### Department of Statistics & Computer Science • University of Kelaniya
 
-Welcome! This portal allows students in the Department of Statistics & Computer Science to request an official private GitHub repository for their module projects.
+Welcome! This portal allows students in the Department of Statistics & Computer Science to request an official GitHub repository for their module projects.
 
 ---
 
-## 🚀 How to Request a Repository (3 Simple Steps)
+## 🚀 How to Request a Repository
 
 You do **not** need any Git knowledge or terminal commands to request a repository.
 
@@ -25,7 +25,7 @@ You do **not** need any Git knowledge or terminal commands to request a reposito
    * **Team Members:** Type your teammates' GitHub usernames (comma-separated).
 3. **Click "Submit new issue".**
 
-That's it! Our automated bot will check your request immediately. Once a coordinator approves it, your private repository will be created automatically — with a **group number assigned for you**.
+Once a coordinator approves it, your private repository will be created automatically — with a **group number assigned for you**.
 
 ---
 
@@ -46,9 +46,7 @@ $$\text{MODULE}-\text{B}\text{YY}-\text{G}\text{NN}-\text{SHORT-TITLE}$$
 * `FSSD-B24-G01-Library-System`
 * `FSSD-B23-G12-Smart-Bus`
 * `FSSD-B22-G47-Ecommerce-App`
-
-*(Group numbers are assigned per batch — `FSSD-B24` and `FSSD-B23` each have their own independent numbering)*
-
+  
 ---
 
 ## 📚 Supported Modules & Batches
