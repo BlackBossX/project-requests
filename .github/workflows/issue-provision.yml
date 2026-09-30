@@ -8,7 +8,7 @@ on:
 
 permissions:
   issues: write
-  contents: read
+  contents: write
 
 jobs:
   provision:
@@ -46,3 +46,20 @@ jobs:
           ACTOR: ${{ github.actor }}
         run: |
           python3 scripts/issue_provision.py
+
+      - name: Install openpyxl
+        run: pip install --quiet openpyxl
+
+      - name: Generate Excel report from CSV
+        env:
+          ISSUE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_FULL_NAME: ${{ github.repository }}
+        run: |
+          python3 scripts/generate_xlsx.py
+
+      - name: Upload Excel report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: projects-report-${{ github.run_id }}
+          path: requests/projects.xlsx
+          if-no-files-found: warn

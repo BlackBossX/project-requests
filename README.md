@@ -21,9 +21,10 @@ You do **not** need any Git knowledge or terminal commands to request a reposito
 1. **Click the green button above** (or go to the **Issues** tab → **New Issue**).
 2. **Fill out the short form:**
    * **Module:** Select your module from the dropdown.
+   * **Student Batch:** Select your intake year.
    * **Project Short Title:** A 1–4 word title with spaces or hyphens (e.g. `Library System`, `Smart-Bus`).
    * **Project Description:** A short sentence about what you are building.
-   * **Team Members:** Type your teammates' GitHub usernames (comma-separated).
+   * **Team Members (Members 1–4):** For each member enter their **Student No**, **Full Name**, and **GitHub Username**. Groups of 2–4 are supported — leave unused rows blank. Member 1 is the Project Lead.
 3. **Click "Submit new issue".**
 
 Once a coordinator approves it, your private repository will be created automatically — with a **group number assigned for you**.
@@ -67,9 +68,39 @@ $$\text{MODULE}-\text{B}\text{YY}-\text{G}\text{NN}-\text{SHORT-TITLE}$$
 ## 👥 What Happens After Approval?
 
 * **Group Number:** Your team is automatically assigned the next available group number.
-* **Project Lead:** The student who submitted the request becomes the **Admin** of the new repository.
-* **Teammates:** Teammates listed in the form will receive an **invitation email** from GitHub granting them write access.
+* **Project Lead:** Member 1 (the student who submitted the request) becomes the **Admin** of the new repository.
+* **Teammates:** Members 2–4 will receive an **invitation email** from GitHub granting them write (`push`) access.
 * **Privacy:** All repositories are created **Private** by default so your code stays safe and secure.
+* **Project Registry:** Your group details (Student Nos, names, GitHub usernames, repo link, and title) are automatically recorded in the project registry CSV.
+
+---
+
+## 📋 Project Registry
+
+Every approved request is automatically logged to `requests/projects.csv` in this repository. This file is the single source of truth for all provisioned groups.
+
+| Column | Description |
+| :--- | :--- |
+| **Group No** | Auto-assigned group number (e.g. `G01`) |
+| **Repo Name** | Full repository name |
+| **Repo Link** | Direct GitHub URL to the repository |
+| **Project Title** | Short title as submitted |
+| **Module** | Module code (`FSSD`) |
+| **Batch** | Batch code (`B22`, `B23`, `B24`) |
+| **Member1–4 Student No** | University student numbers |
+| **Member1–4 Name** | Full names |
+| **Member1–4 GitHub** | GitHub usernames |
+
+### 📥 Downloading the Excel Report
+
+After every approval, a formatted Excel (`.xlsx`) report is generated and uploaded as a **downloadable Actions artifact**:
+
+1. Go to the **Actions** tab in this repository.
+2. Click the latest **"Provision Approved Repository"** workflow run.
+3. Scroll to the bottom → **Artifacts** section.
+4. Click **`projects-report-{run_id}`** to download the `.xlsx` file.
+
+The Excel file includes navy-styled headers, alternating row colours, auto-filter dropdowns, a frozen header row, and clickable repository hyperlinks.
 
 ---
 
@@ -86,6 +117,15 @@ The bot will leave a friendly comment telling you what to fix. Just click the **
 
 **4. How is my group number decided?**  
 Group numbers are assigned automatically and sequentially when your request is approved — no action needed from you.
+
+**5. What format should my Student No be in?**  
+Enter it exactly as shown on your student ID (e.g. `EC/2022/001`). The bot does not validate the format, so please double-check before submitting.
+
+**6. Can groups have fewer than 4 members?**  
+Yes — groups of **2, 3, or 4** members are all supported. Simply leave the unused Member rows blank.
+
+**7. How do I get the Excel project report?**  
+After any repository is provisioned, go to the **Actions** tab → latest workflow run → **Artifacts** section and download `projects-report-{run_id}.xlsx`.
 
 ---
 

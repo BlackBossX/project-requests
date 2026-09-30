@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Generated Excel report (uploaded as Actions artifact, never committed)
+requests/projects.xlsx
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db

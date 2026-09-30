@@ -13,12 +13,12 @@ import sys
 import urllib.error
 import urllib.request
 
-# Module code → prefix mapping
+# Module code -> prefix mapping
 MODULE_MAP = {
-    "COSC 32133 / BECS 32263 – Full-Stack Software Development (FSSD)": "FSSD",
+    "COSC 32133 / BECS 32263 \u2013 Full-Stack Software Development (FSSD)": "FSSD",
 }
 
-# Batch label → batch code mapping
+# Batch label -> batch code mapping
 BATCH_MAP = {
     "22/23": "B22",
     "23/24": "B23",
@@ -28,7 +28,7 @@ BATCH_MAP = {
 # Short title: 1-4 words of letters/digits separated by spaces or hyphens
 SHORT_TITLE_REGEX = re.compile(r"^[A-Za-z0-9]+([- ][A-Za-z0-9]+){0,3}$")
 GITHUB_USER_REGEX = re.compile(r"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$")
-MAX_MEMBERS = 6
+MAX_MEMBERS = 4
 
 
 def api_request(method: str, endpoint: str, token: str = "", data: dict = None):
@@ -82,8 +82,13 @@ def parse_issue_form(body: str) -> dict:
     return fields
 
 
+def is_blank(value: str) -> bool:
+    """Returns True if the field is empty or the GitHub Issues '_No response_' placeholder."""
+    return not value or value.lower() == "_no response_"
+
+
 def normalize_short_title(raw: str) -> str:
-    """Converts short title to title case with hyphens (e.g. 'smart bus' → 'Smart-Bus')."""
+    """Converts short title to title case with hyphens (e.g. 'smart bus' -> 'Smart-Bus')."""
     return re.sub(r"[\s-]+", "-", raw.strip()).title()
 
 
@@ -110,6 +115,31 @@ def upsert_comment(repo_full_name: str, issue_number: str, token: str, comment_t
     api_request("POST", f"/repos/{repo_full_name}/issues/{issue_number}/comments", token, {"body": full_comment})
 
 
+def parse_members(form: dict) -> list:
+    """
+    Extracts up to 4 structured member entries from the issue form.
+    Each entry is a dict with keys: index, student_no, name, github.
+    Only rows where at least one field is non-blank are included.
+    """
+    members = []
+    for i in range(1, 5):
+        student_no = form.get(f"Member {i} \u2013 Student No", "").strip()
+        name = form.get(f"Member {i} \u2013 Full Name", "").strip()
+        github = form.get(f"Member {i} \u2013 GitHub Username", "").strip().lstrip("@")
+
+        # Skip entirely blank rows (all three fields blank)
+        if is_blank(student_no) and is_blank(name) and is_blank(github):
+            continue
+
+        members.append({
+            "index": i,
+            "student_no": "" if is_blank(student_no) else student_no,
+            "name": "" if is_blank(name) else name,
+            "github": "" if is_blank(github) else github,
+        })
+    return members
+
+
 def main():
     token = os.environ.get("GITHUB_TOKEN", "")
     repo_full_name = os.environ.get("REPO_FULL_NAME", "")
@@ -128,7 +158,6 @@ def main():
     raw_batch = form.get("Student Batch", "").strip()
     raw_short_title = form.get("Project Short Title", "").strip()
     description = form.get("Project Description", "").strip()
-    raw_members = form.get("Team Members (GitHub Usernames)", "").strip()
 
     errors = []
     checks = {}
@@ -140,7 +169,7 @@ def main():
             f"Unrecognised module: `{raw_module}`. Please select a valid module from the dropdown."
         )
     else:
-        checks["Module"] = f"✅ `{raw_module}`"
+        checks["Module"] = f"\u2705 `{raw_module}`"
 
     # 2. Batch validation
     batch_code = BATCH_MAP.get(raw_batch)
@@ -149,7 +178,7 @@ def main():
             f"Unrecognised batch: `{raw_batch}`. Please select a valid batch (`22/23`, `23/24`, or `24/25`)."
         )
     else:
-        checks["Batch"] = f"✅ `{raw_batch}` → `{batch_code}`"
+        checks["Batch"] = f"\u2705 `{raw_batch}` \u2192 `{batch_code}`"
 
     # 3. Short title validation
     if not raw_short_title or raw_short_title.lower() == "_no response_":
@@ -157,52 +186,61 @@ def main():
     elif not SHORT_TITLE_REGEX.match(raw_short_title):
         errors.append(
             f"Invalid short title `{raw_short_title}`. "
-            f"Use 1–4 words with letters/digits separated by spaces or hyphens "
+            f"Use 1\u20134 words with letters/digits separated by spaces or hyphens "
             f"(e.g. `Library System`, `Smart-Bus`, `Ecommerce`)."
         )
     else:
         normalized = normalize_short_title(raw_short_title)
-        checks["Short Title"] = f"✅ Will be stored as `{normalized}`"
+        checks["Short Title"] = f"\u2705 Will be stored as `{normalized}`"
 
     # 4. Description check
     if not description or description.lower() == "_no response_":
         errors.append("Project Description is required.")
     else:
-        checks["Description"] = "✅ Provided"
+        checks["Description"] = "\u2705 Provided"
 
     # 5. Members validation
-    members = []
-    if raw_members and raw_members.lower() != "_no response_":
-        members = [m.strip().lstrip("@") for m in re.split(r"[,;\s]+", raw_members) if m.strip()]
+    members = parse_members(form)
 
-    if len(members) > MAX_MEMBERS:
-        errors.append(f"Too many team members listed ({len(members)}). Maximum allowed is {MAX_MEMBERS}.")
+    if len(members) == 0:
+        errors.append(
+            "At least one team member (Member 1 \u2013 Project Lead) must be provided with "
+            "Student No, Full Name, and GitHub Username."
+        )
+    elif len(members) > MAX_MEMBERS:
+        errors.append(f"Too many team members ({len(members)}). Maximum allowed is {MAX_MEMBERS}.")
     else:
-        users_to_verify = set(members)
-        if issue_author:
-            users_to_verify.add(issue_author)
-
-        for u in users_to_verify:
-            if not GITHUB_USER_REGEX.match(u):
-                errors.append(f"Invalid username syntax: `@{u}`.")
-                continue
-            status, _ = api_request("GET", f"/users/{u}", token)
-            if status == 404:
-                errors.append(f"GitHub user `@{u}` does not exist.")
+        for m in members:
+            i = m["index"]
+            if not m["student_no"]:
+                errors.append(f"Member {i}: Student No is required.")
+            if not m["name"]:
+                errors.append(f"Member {i}: Full Name is required.")
+            if not m["github"]:
+                errors.append(f"Member {i}: GitHub Username is required.")
+            elif not GITHUB_USER_REGEX.match(m["github"]):
+                errors.append(f"Member {i}: Invalid GitHub username syntax: `@{m['github']}`.")
+            else:
+                status, _ = api_request("GET", f"/users/{m['github']}", token)
+                if status == 404:
+                    errors.append(f"Member {i}: GitHub user `@{m['github']}` does not exist.")
 
         if not errors:
-            checks["Team Accounts"] = f"✅ All verified ({', '.join(f'@{u}' for u in users_to_verify)})"
+            member_summary = ", ".join(
+                f"`@{m['github']}` ({m['name']})" for m in members
+            )
+            checks["Team Members"] = f"\u2705 {len(members)} member(s) verified: {member_summary}"
 
     # 6. Preview expected repo name
     if module_prefix and batch_code and raw_short_title and SHORT_TITLE_REGEX.match(raw_short_title):
         normalized = normalize_short_title(raw_short_title)
         expected_prefix = f"{module_prefix}-{batch_code}-G??-{normalized}"
-        checks["Expected Repo Name"] = f"🔢 `{expected_prefix}` *(group number assigned on approval)*"
+        checks["Expected Repo Name"] = f"\U0001f522 `{expected_prefix}` *(group number assigned on approval)*"
 
     if errors:
         comment = (
-            "### 🤖 SCSSA Request Bot\n\n"
-            "**Status:** ❌ **Action Required**\n\n"
+            "### \U0001f916 SCSSA Request Bot\n\n"
+            "**Status:** \u274c **Action Required**\n\n"
             "Please edit your issue description and correct the following:\n\n"
             + "\n".join(f"- {err}" for err in errors)
             + "\n\n---\n"
@@ -214,18 +252,17 @@ def main():
         sys.exit(1)
     else:
         checks_table = "\n".join(f"| {k} | {v} |" for k, v in checks.items())
-        members_str = ", ".join(f"`@{m}`" for m in members) if members else "None (Individual project)"
+        lead = members[0] if members else {}
         comment = (
-            "### 🤖 SCSSA Request Bot\n\n"
-            "**Status:** ✅ **Validation Passed**\n\n"
+            "### \U0001f916 SCSSA Request Bot\n\n"
+            "**Status:** \u2705 **Validation Passed**\n\n"
             "Your project request has been verified and is ready for administrator approval.\n\n"
             "| Check | Status |\n"
             "| :--- | :--- |\n"
             f"{checks_table}\n"
-            f"| **Project Lead** | `@{issue_author}` (Admin) |\n"
-            f"| **Team Members** | {members_str} |\n\n"
+            f"| **Project Lead** | `@{lead.get('github', '')}` \u2013 {lead.get('name', '')} *(Admin)* |\n\n"
             "---\n"
-            "👩‍🏫 **Administrator Action:** Add the label **`approved`** or comment **`/approved`** to provision this repository immediately."
+            "\U0001f469\u200d\U0001f3eb **Administrator Action:** Add the label **`approved`** or comment **`/approved`** to provision this repository immediately."
         )
         update_issue_labels(repo_full_name, issue_number, token, add_labels=["pending-approval"], remove_labels=["needs-revision"])
         upsert_comment(repo_full_name, issue_number, token, comment)

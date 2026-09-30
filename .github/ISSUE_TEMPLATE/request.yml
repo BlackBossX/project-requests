@@ -50,11 +50,118 @@ body:
     validations:
       required: true
 
-  - type: input
-    id: members
+  - type: markdown
     attributes:
-      label: Team Members (GitHub Usernames)
-      description: Comma-separated GitHub usernames of your teammates. You (the issue creator) will automatically be assigned as Admin. Maximum 6 members.
-      placeholder: teammate1, teammate2, teammate3
+      value: |
+        ---
+        ### 👥 Team Members
+        Enter the details for each team member below. Groups can have **2–4 members**. Leave rows blank for unused slots.
+        **Member 1** is the **Project Lead** and will be assigned as repository Admin.
+
+  - type: input
+    id: member1_student_no
+    attributes:
+      label: "Member 1 – Student No"
+      description: "Registered university student number of the Project Lead (e.g. `E/22/001`)."
+      placeholder: "EC/2022/001"
+    validations:
+      required: true
+
+  - type: input
+    id: member1_name
+    attributes:
+      label: "Member 1 – Full Name"
+      description: "Full name of the Project Lead."
+      placeholder: "Malan De Alwis"
+    validations:
+      required: true
+
+  - type: input
+    id: member1_github
+    attributes:
+      label: "Member 1 – GitHub Username"
+      description: "GitHub username of the Project Lead. They will be assigned as repository Admin."
+      placeholder: "malanalwis"
+    validations:
+      required: true
+
+  - type: input
+    id: member2_student_no
+    attributes:
+      label: "Member 2 – Student No"
+      description: "Registered university student number (leave blank if not applicable)."
+      placeholder: "EC/2022/026"
+    validations:
+      required: false
+
+  - type: input
+    id: member2_name
+    attributes:
+      label: "Member 2 – Full Name"
+      description: "Full name of this team member (leave blank if not applicable)."
+      placeholder: "Kavindu Sachinthe"
+    validations:
+      required: false
+
+  - type: input
+    id: member2_github
+    attributes:
+      label: "Member 2 – GitHub Username"
+      description: "GitHub username of this team member (leave blank if not applicable)."
+      placeholder: "kavindu-s"
+    validations:
+      required: false
+
+  - type: input
+    id: member3_student_no
+    attributes:
+      label: "Member 3 – Student No"
+      description: "Registered university student number (leave blank if not applicable)."
+      placeholder: "EC/2022/003"
+    validations:
+      required: false
+
+  - type: input
+    id: member3_name
+    attributes:
+      label: "Member 3 – Full Name"
+      description: "Full name of this team member (leave blank if not applicable)."
+      placeholder: "Dilshan Fernando"
+    validations:
+      required: false
+
+  - type: input
+    id: member3_github
+    attributes:
+      label: "Member 3 – GitHub Username"
+      description: "GitHub username of this team member (leave blank if not applicable)."
+      placeholder: "dilshan-f"
+    validations:
+      required: false
+
+  - type: input
+    id: member4_student_no
+    attributes:
+      label: "Member 4 – Student No"
+      description: "Registered university student number (leave blank if not applicable)."
+      placeholder: "EC/2022/019"
+    validations:
+      required: false
+
+  - type: input
+    id: member4_name
+    attributes:
+      label: "Member 4 – Full Name"
+      description: "Full name of this team member (leave blank if not applicable)."
+      placeholder: "Sachini Bandara"
+    validations:
+      required: false
+
+  - type: input
+    id: member4_github
+    attributes:
+      label: "Member 4 – GitHub Username"
+      description: "GitHub username of this team member (leave blank if not applicable)."
+      placeholder: "sachini-b"
     validations:
       required: false
