@@ -63,7 +63,7 @@ body:
     attributes:
       label: "Member 1 – Student No"
       description: "Registered university student number of the Project Lead (e.g. `E/22/001`)."
-      placeholder: "E/22/001"
+      placeholder: "EC/2022/001"
     validations:
       required: true
 
@@ -72,7 +72,7 @@ body:
     attributes:
       label: "Member 1 – Full Name"
       description: "Full name of the Project Lead."
-      placeholder: "Kavindu Perera"
+      placeholder: "Malan De Alwis"
     validations:
       required: true
 
@@ -81,7 +81,7 @@ body:
     attributes:
       label: "Member 1 – GitHub Username"
       description: "GitHub username of the Project Lead. They will be assigned as repository Admin."
-      placeholder: "kavindu-p"
+      placeholder: "malanalwis"
     validations:
       required: true
 
@@ -90,7 +90,7 @@ body:
     attributes:
       label: "Member 2 – Student No"
       description: "Registered university student number (leave blank if not applicable)."
-      placeholder: "E/22/002"
+      placeholder: "EC/2022/026"
     validations:
       required: false
 
@@ -99,7 +99,7 @@ body:
     attributes:
       label: "Member 2 – Full Name"
       description: "Full name of this team member (leave blank if not applicable)."
-      placeholder: "Nethmi Silva"
+      placeholder: "Kavindu Sachinthe"
     validations:
       required: false
 
@@ -108,7 +108,7 @@ body:
     attributes:
       label: "Member 2 – GitHub Username"
       description: "GitHub username of this team member (leave blank if not applicable)."
-      placeholder: "nethmi-s"
+      placeholder: "kavindu-s"
     validations:
       required: false
 
@@ -117,7 +117,7 @@ body:
     attributes:
       label: "Member 3 – Student No"
       description: "Registered university student number (leave blank if not applicable)."
-      placeholder: "E/22/003"
+      placeholder: "EC/2022/003"
     validations:
       required: false
 
@@ -144,7 +144,7 @@ body:
     attributes:
       label: "Member 4 – Student No"
       description: "Registered university student number (leave blank if not applicable)."
-      placeholder: "E/22/004"
+      placeholder: "EC/2022/019"
     validations:
       required: false
 
