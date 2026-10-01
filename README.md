@@ -21,7 +21,7 @@ You do **not** need any Git knowledge or terminal commands to request a reposito
 1. **Click the green button above** (or go to the **Issues** tab → **New Issue**).
 2. **Fill out the short form:**
    * **Module:** Select your module from the dropdown.
-   * **Student Batch:** Select your intake year.
+   * **Academic Year:** Select the academic year for this project.
    * **Project Short Title:** A 1–4 word title with spaces or hyphens (e.g. `Library System`, `Smart-Bus`).
    * **Project Description:** A short sentence about what you are building.
    * **Team Members (Members 1–4):** For each member enter their **Student No**, **Full Name**, and **GitHub Username**. Groups of 2–4 are supported — leave unused rows blank. Member 1 is the Project Lead.
@@ -35,33 +35,32 @@ Once a coordinator approves it, your private repository will be created automati
 
 You do **not** choose a repository name — it is generated automatically based on your module, batch, and a sequential group number:
 
-$$\text{MODULE}-\text{B}\text{YY}-\text{G}\text{NN}-\text{SHORT-TITLE}$$
+$$\text{MODULE}-\text{YY-YY}-\text{G}\text{NN}-\text{SHORT-TITLE}$$
 
 | Part | What it means | Example |
 | :--- | :--- | :--- |
 | **MODULE** | Short code for your module (uppercase) | `FSSD` |
-| **BYY** | Your student batch | `B22`, `B23`, `B24` |
-| **GNN** | Auto-assigned group number per batch (zero-padded) | `G01`, `G12`, `G47` |
+| **YY-YY** | The academic year | `24-25`, `25-26` |
+| **GNN** | Auto-assigned group number per academic year (zero-padded) | `G01`, `G12`, `G47` |
 | **SHORT-TITLE** | Your 1–4 word project title (auto Title Case) | `Smart-Bus`, `Library-System` |
 
 ### ✅ Examples:
-* `FSSD-B24-G01-Library-System`
-* `FSSD-B23-G12-Smart-Bus`
-* `FSSD-B22-G47-Ecommerce-App`
+* `FSSD-24-25-G01-Library-System`
+* `FSSD-24-25-G12-Smart-Bus`
+* `FSSD-25-26-G47-Ecommerce-App`
   
 ---
 
-## 📚 Supported Modules & Batches
+## 📚 Supported Modules & Academic Years
 
 | Module Code | Full Name |
 | :--- | :--- |
 | `FSSD` | COSC 32133 / BECS 32263 – Full-Stack Software Development |
 
-| Batch Label | Batch Code |
+| Academic Year | Code |
 | :--- | :--- |
-| `22/23` | `B22` |
-| `23/24` | `B23` |
-| `24/25` | `B24` |
+| `24/25` | `24-25` |
+| `25/26` | `25-26` |
 
 ---
 
@@ -77,7 +76,7 @@ $$\text{MODULE}-\text{B}\text{YY}-\text{G}\text{NN}-\text{SHORT-TITLE}$$
 
 ## 📋 Project Registry
 
-Every approved request is automatically logged to `requests/projects.csv` in this repository. This file is the single source of truth for all provisioned groups.
+Every approved request is automatically logged to `projects.csv` in the private documentation repository (`SCSSA-UoK/scssa-project-records`). This file is the single source of truth for all provisioned groups.
 
 | Column | Description |
 | :--- | :--- |
@@ -86,19 +85,17 @@ Every approved request is automatically logged to `requests/projects.csv` in thi
 | **Repo Link** | Direct GitHub URL to the repository |
 | **Project Title** | Short title as submitted |
 | **Module** | Module code (`FSSD`) |
-| **Batch** | Batch code (`B22`, `B23`, `B24`) |
+| **Academic Year** | Academic year (`24-25`, `25-26`) |
 | **Member1–4 Student No** | University student numbers |
 | **Member1–4 Name** | Full names |
 | **Member1–4 GitHub** | GitHub usernames |
 
 ### 📥 Downloading the Excel Report
 
-After every approval, a formatted Excel (`.xlsx`) report is generated and uploaded as a **downloadable Actions artifact**:
+After every approval, a formatted Excel (`.xlsx`) report is generated and committed directly to the private documentation repository.
 
-1. Go to the **Actions** tab in this repository.
-2. Click the latest **"Provision Approved Repository"** workflow run.
-3. Scroll to the bottom → **Artifacts** section.
-4. Click **`projects-report-{run_id}`** to download the `.xlsx` file.
+1. Go to the `SCSSA-UoK/scssa-project-records` repository (requires Admin access).
+2. Download the `projects.xlsx` file directly from the repository.
 
 The Excel file includes navy-styled headers, alternating row colours, auto-filter dropdowns, a frozen header row, and clickable repository hyperlinks.
 
@@ -125,7 +122,7 @@ Enter it exactly as shown on your student ID (e.g. `EC/2022/001`). The bot does 
 Yes — groups of **2, 3, or 4** members are all supported. Simply leave the unused Member rows blank.
 
 **7. How do I get the Excel project report?**  
-After any repository is provisioned, go to the **Actions** tab → latest workflow run → **Artifacts** section and download `projects-report-{run_id}.xlsx`.
+It is automatically saved in the private `scssa-project-records` repository. Administrators can download it from there at any time.
 
 ---
 

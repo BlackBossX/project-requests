@@ -21,14 +21,13 @@ body:
       required: true
 
   - type: dropdown
-    id: batch
+    id: academic_year
     attributes:
-      label: Student Batch
-      description: Select your student batch (intake year).
+      label: Academic Year
+      description: Select the academic year for this project.
       options:
-        - "22/23"
-        - "23/24"
         - "24/25"
+        - "25/26"
     validations:
       required: true
 

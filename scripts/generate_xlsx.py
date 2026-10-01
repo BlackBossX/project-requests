@@ -40,13 +40,13 @@ BORDER      = Border(left=THIN, right=THIN, top=THIN, bottom=THIN)
 # Consolidated Excel columns (1 row per group, members stacked in cells)
 EXCEL_HEADERS = [
     "Group No", "Repo Name", "Repo Link", "Project Title",
-    "Module", "Batch",
+    "Module", "Academic Year",
     "Student Numbers", "Names", "GitHub Usernames",
 ]
 
 COL_WIDTHS = {
     "Group No": 10, "Repo Name": 38, "Repo Link": 52,
-    "Project Title": 22, "Module": 10, "Batch": 8,
+    "Project Title": 22, "Module": 10, "Academic Year": 15,
     "Student Numbers": 20, "Names": 24, "GitHub Usernames": 22,
 }
 
@@ -99,7 +99,7 @@ def consolidate_row(csv_row: dict) -> dict:
         "Repo Link":        csv_row.get("Repo Link", ""),
         "Project Title":    csv_row.get("Project Title", ""),
         "Module":           csv_row.get("Module", ""),
-        "Batch":            csv_row.get("Batch", ""),
+        "Academic Year":    csv_row.get("Academic Year", ""),
         "Student Numbers":  stack(MEMBER_FIELDS["Student Numbers"]),
         "Names":            stack(MEMBER_FIELDS["Names"]),
         "GitHub Usernames": stack(MEMBER_FIELDS["GitHub Usernames"]),

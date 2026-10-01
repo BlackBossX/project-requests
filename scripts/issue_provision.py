@@ -24,10 +24,9 @@ MODULE_MAP = {
     "COSC 32133 / BECS 32263 \u2013 Full-Stack Software Development (FSSD)": "FSSD",
 }
 
-BATCH_MAP = {
-    "22/23": "B22",
-    "23/24": "B23",
-    "24/25": "B24",
+ACADEMIC_YEAR_MAP = {
+    "24/25": "24-25",
+    "25/26": "25-26",
 }
 
 CSV_PATH = "projects.csv"
@@ -38,7 +37,7 @@ CSV_HEADERS = [
     "Repo Link",
     "Project Title",
     "Module",
-    "Batch",
+    "Academic Year",
     "Member1 Student No", "Member1 Name", "Member1 GitHub",
     "Member2 Student No", "Member2 Name", "Member2 GitHub",
     "Member3 Student No", "Member3 Name", "Member3 GitHub",
@@ -123,9 +122,9 @@ def parse_members(form: dict) -> list:
     return members
 
 
-def get_next_group_number(org: str, module_prefix: str, batch_code: str, token: str) -> int:
+def get_next_group_number(org: str, module_prefix: str, academic_year_code: str, token: str) -> int:
     group_regex = re.compile(
-        rf"^{re.escape(module_prefix)}-{re.escape(batch_code)}-G(\d+)-",
+        rf"^{re.escape(module_prefix)}-{re.escape(academic_year_code)}-G(\d+)-",
         re.IGNORECASE
     )
     max_group = 0
@@ -264,19 +263,19 @@ def main():
             sys.exit(1)
 
     form = parse_issue_form(issue_body)
-    raw_module      = form.get("Module", "").strip()
-    raw_batch       = form.get("Student Batch", "").strip()
-    raw_short_title = form.get("Project Short Title", "").strip()
-    description     = form.get("Project Description", "Student project repository").strip()
+    raw_module        = form.get("Module", "").strip()
+    raw_academic_year = form.get("Academic Year", "").strip()
+    raw_short_title   = form.get("Project Short Title", "").strip()
+    description       = form.get("Project Description", "Student project repository").strip()
 
     module_prefix = MODULE_MAP.get(raw_module)
     if not module_prefix:
         print(f"Error: Unrecognised module '{raw_module}'.", file=sys.stderr)
         sys.exit(1)
 
-    batch_code = BATCH_MAP.get(raw_batch)
-    if not batch_code:
-        print(f"Error: Unrecognised batch '{raw_batch}'.", file=sys.stderr)
+    academic_year_code = ACADEMIC_YEAR_MAP.get(raw_academic_year)
+    if not academic_year_code:
+        print(f"Error: Unrecognised academic year '{raw_academic_year}'.", file=sys.stderr)
         sys.exit(1)
 
     if is_blank(raw_short_title):
@@ -292,9 +291,9 @@ def main():
     lead = members[0]
     lead_github = lead["github"] or issue_author
 
-    print(f"Calculating next group number for '{module_prefix}-{batch_code}'...")
-    group_number = get_next_group_number(org_name, module_prefix, batch_code, app_token)
-    repo_name    = f"{module_prefix}-{batch_code}-G{group_number:02d}-{short_title}"
+    print(f"Calculating next group number for '{module_prefix}-{academic_year_code}'...")
+    group_number = get_next_group_number(org_name, module_prefix, academic_year_code, app_token)
+    repo_name    = f"{module_prefix}-{academic_year_code}-G{group_number:02d}-{short_title}"
 
     print(f"Provisioning repository '{org_name}/{repo_name}' for issue #{issue_number}")
 
@@ -344,7 +343,7 @@ def main():
         f"| Attribute | Value |\n| :--- | :--- |\n"
         f"| **Repository** | [{org_name}/{repo_name}]({new_repo_url}) |\n"
         f"| **Module** | `{raw_module}` |\n"
-        f"| **Batch** | `{raw_batch}` (`{batch_code}`) |\n"
+        f"| **Academic Year** | `{raw_academic_year}` (`{academic_year_code}`) |\n"
         f"| **Group Number** | `Group {group_number:02d}` |\n"
         f"| **Visibility** | `Private` \U0001f512 |\n\n"
         f"---\n"
@@ -375,7 +374,7 @@ def main():
         "Repo Link":          new_repo_url,
         "Project Title":      raw_short_title,
         "Module":             module_prefix,
-        "Batch":              batch_code,
+        "Academic Year":      academic_year_code,
         "Member1 Student No": padded[0].get("student_no", ""),
         "Member1 Name":       padded[0].get("name", ""),
         "Member1 GitHub":     padded[0].get("github", ""),
@@ -392,7 +391,7 @@ def main():
     print(f"Updating CSV in docs repo '{docs_repo}'...")
     update_csv(docs_repo, app_token, csv_row)
 
-    print(f"\u2728 Provisioning complete: '{org_name}/{repo_name}' (Batch {raw_batch}, Group {group_number:02d})")
+    print(f"\u2728 Provisioning complete: '{org_name}/{repo_name}' (Academic Year {raw_academic_year}, Group {group_number:02d})")
 
 
 if __name__ == "__main__":

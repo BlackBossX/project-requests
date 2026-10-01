@@ -16,10 +16,9 @@ MODULE_MAP = {
     "COSC 32133 / BECS 32263 \u2013 Full-Stack Software Development (FSSD)": "FSSD",
 }
 
-BATCH_MAP = {
-    "22/23": "B22",
-    "23/24": "B23",
-    "24/25": "B24",
+ACADEMIC_YEAR_MAP = {
+    "24/25": "24-25",
+    "25/26": "25-26",
 }
 
 SHORT_TITLE_REGEX = re.compile(r"^[A-Za-z0-9]+([- ][A-Za-z0-9]+){0,3}$")
@@ -132,10 +131,10 @@ def main():
 
     form = parse_issue_form(issue_body)
 
-    raw_module      = form.get("Module", "").strip()
-    raw_batch       = form.get("Student Batch", "").strip()
-    raw_short_title = form.get("Project Short Title", "").strip()
-    description     = form.get("Project Description", "").strip()
+    raw_module        = form.get("Module", "").strip()
+    raw_academic_year = form.get("Academic Year", "").strip()
+    raw_short_title   = form.get("Project Short Title", "").strip()
+    description       = form.get("Project Description", "").strip()
 
     errors = []
     checks = {}
@@ -147,12 +146,12 @@ def main():
     else:
         checks["Module"] = f"\u2705 `{raw_module}`"
 
-    # 2. Batch
-    batch_code = BATCH_MAP.get(raw_batch)
-    if not batch_code:
-        errors.append(f"Unrecognised batch: `{raw_batch}`. Please select `22/23`, `23/24`, or `24/25`.")
+    # 2. Academic Year
+    academic_year_code = ACADEMIC_YEAR_MAP.get(raw_academic_year)
+    if not academic_year_code:
+        errors.append(f"Unrecognised academic year: `{raw_academic_year}`. Please select `24/25` or `25/26`.")
     else:
-        checks["Batch"] = f"\u2705 `{raw_batch}` \u2192 `{batch_code}`"
+        checks["Academic Year"] = f"\u2705 `{raw_academic_year}` \u2192 `{academic_year_code}`"
 
     # 3. Short title
     if is_blank(raw_short_title):
@@ -199,9 +198,9 @@ def main():
             checks["Team Members"] = f"\u2705 {len(members)} member(s) verified"
 
     # 6. Expected repo name preview
-    if module_prefix and batch_code and not is_blank(raw_short_title) and SHORT_TITLE_REGEX.match(raw_short_title):
+    if module_prefix and academic_year_code and not is_blank(raw_short_title) and SHORT_TITLE_REGEX.match(raw_short_title):
         normalized = normalize_short_title(raw_short_title)
-        checks["Expected Repo Name"] = f"\U0001f522 `{module_prefix}-{batch_code}-G??-{normalized}` *(group number assigned on approval)*"
+        checks["Expected Repo Name"] = f"\U0001f522 `{module_prefix}-{academic_year_code}-G??-{normalized}` *(group number assigned on approval)*"
 
     if errors:
         comment = (
