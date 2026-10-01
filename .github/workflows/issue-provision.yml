@@ -51,11 +51,6 @@ jobs:
       - name: Install openpyxl
         run: pip install --quiet openpyxl
 
-      - name: Configure Git identity for report commit
-        run: |
-          git config --global user.name "kelaniya"
-          git config --global user.email "kavindus0@icloud.com"
-
       - name: Generate and commit Excel report to docs repo
         env:
           APP_TOKEN: ${{ steps.app-token.outputs.token }}
